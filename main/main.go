@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 	"log"
-	"net/http"
 	"os"
 	"regexp"
 
@@ -54,9 +53,7 @@ func run(cgroup string) error {
 	}
 
 	proxy := lancelot.NewProxy(cli, cgroup)
-
-	http.HandleFunc("/_ping", proxy.Ping)
-	return http.ListenAndServe(":2375", nil)
+	return proxy.Serve(":2375")
 }
 
 // selfCgroup retrieve lancelot's own cgroup and use it to restrict docker resources created through proxy
