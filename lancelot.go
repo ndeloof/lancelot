@@ -39,4 +39,6 @@ func (p *Proxy) Serve(addr string) error {
 
 func (p *Proxy) RegisterRoutes(r *mux.Router) {
 	r.Path("/_ping").Methods("GET").HandlerFunc(p.Ping)
+	r.Path("/version").Methods("GET").HandlerFunc(p.Version)
+	r.Path("/v{version:[0-9.]+}/version").Methods("GET").HandlerFunc(p.Version)
 }
