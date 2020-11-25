@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-func (p *Proxy) Ping(w http.ResponseWriter, r *http.Request) {
+func (p *Proxy) ping(w http.ResponseWriter, r *http.Request) {
 	ping, err := p.api.Ping(context.Background())
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
