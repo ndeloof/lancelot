@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os"
 	"strconv"
 
 	"github.com/docker/docker/api/server/httputils"
@@ -13,8 +12,7 @@ import (
 func (p *Proxy) version(w http.ResponseWriter, r *http.Request) {
 	version, err := p.api.ServerVersion(context.Background())
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err.Error())
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		p.error(w, err)
 		return
 	}
 

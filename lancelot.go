@@ -1,6 +1,7 @@
 package lancelot
 
 import (
+	"fmt"
 	"net"
 	"net/http"
 	"os"
@@ -40,8 +41,16 @@ func (p *Proxy) Serve(addr string) error {
 
 func (p *Proxy) RegisterRoutes(r *mux.Router) {
 	r.Path("/_ping").Methods("GET").HandlerFunc(p.ping)
+	r.Path("/_ping").Methods("HEAD").HandlerFunc(p.ping)
 	r.Path("/version").Methods("GET").HandlerFunc(p.version)
 	r.Path("/v{version:[0-9.]+}/version").Methods("GET").HandlerFunc(p.version)
 	r.Path("/info").Methods("GET").HandlerFunc(p.info)
 	r.Path("/v{version:[0-9.]+}/info").Methods("GET").HandlerFunc(p.info)
+
+	r.Path("/v{version:[0-9.]+}/containers/json").Methods("GET").HandlerFunc(p.containerList)
+}
+
+func (p *Proxy) error(w http.ResponseWriter, err error) {
+	fmt.Fprintln(os.Stderr, err.Error())
+	http.Error(w, err.Error(), http.StatusInternalServerError)
 }
