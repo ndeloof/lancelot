@@ -28,6 +28,9 @@ copy supported fields _only_ into Moby API Client structs, and add it's own ones
  | docker client |--------> tcp:2375 | lancelot proxy | -------> docker.sock | docker engine  |
  +---------------+                   +----------------+                      +----------------+
 
+                                        //  only allow API/parameters subset
+                                        //  tag resources as com.docker.lancelot
+
 ```
 
 ### Moby API subset

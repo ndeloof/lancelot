@@ -52,6 +52,7 @@ func (p *Proxy) RegisterRoutes(r *mux.Router) {
 
 	r.Path("/v{version:[0-9.]+}/containers/json").Methods("GET").HandlerFunc(p.containerList)
 	r.Path("/v{version:[0-9.]+}/containers/{name:.*}/json").Methods("GET").HandlerFunc(p.containerInspect)
+	r.Path("/v{version:[0-9.]+}/containers/create").Methods("POST").HandlerFunc(p.containerCreate)
 }
 
 func (p *Proxy) error(w http.ResponseWriter, err error) {

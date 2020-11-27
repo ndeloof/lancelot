@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"regexp"
@@ -14,6 +15,11 @@ import (
 )
 
 func main() {
+	fmt.Println(`
+	╦  ┌─┐┌┐┌┌─┐┌─┐┬  ┌─┐┌┬┐
+	║  ├─┤││││  ├┤ │  │ │ │ 
+	╩═╝┴ ┴┘└┘└─┘└─┘┴─┘└─┘ ┴ `)
+
 	var cgroup string
 
 	app := &cli.App{
@@ -38,7 +44,7 @@ func main() {
 }
 
 func run(cgroup string) error {
-	cli, err := client.NewClientWithOpts(client.FromEnv)
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		return err
 	}
