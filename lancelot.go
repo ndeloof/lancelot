@@ -6,7 +6,10 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/docker/docker/api/server/httputils"
+	"github.com/docker/docker/api/types"
 	moby "github.com/docker/docker/client"
+	"github.com/docker/docker/errdefs"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
@@ -48,9 +51,24 @@ func (p *Proxy) RegisterRoutes(r *mux.Router) {
 	r.Path("/v{version:[0-9.]+}/info").Methods("GET").HandlerFunc(p.info)
 
 	r.Path("/v{version:[0-9.]+}/containers/json").Methods("GET").HandlerFunc(p.containerList)
+	r.Path("/v{version:[0-9.]+}/containers/{name:.*}/json").Methods("GET").HandlerFunc(p.containerInspect)
 }
 
 func (p *Proxy) error(w http.ResponseWriter, err error) {
 	fmt.Fprintln(os.Stderr, err.Error())
-	http.Error(w, err.Error(), http.StatusInternalServerError)
+	response := &types.ErrorResponse{
+		Message: err.Error(),
+	}
+	httputils.WriteJSON(w, errdefs.GetHTTPErrorStatusCode(err), response)
 }
+
+type objNotFoundError struct {
+	object string
+	id     string
+}
+
+func (e objNotFoundError) Error() string {
+	return "No such " + e.object + ": " + e.id
+}
+
+func (e objNotFoundError) NotFound() {}

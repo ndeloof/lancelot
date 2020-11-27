@@ -7,6 +7,7 @@ import (
 	"github.com/docker/docker/api/server/httputils"
 	moby "github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
+	"github.com/gorilla/mux"
 )
 
 func (p *Proxy) containerList(w http.ResponseWriter, r *http.Request) {
@@ -34,6 +35,27 @@ func (p *Proxy) containerList(w http.ResponseWriter, r *http.Request) {
 		p.error(w, err)
 		return
 	}
+	for i, c := range containers {
+		delete(c.Labels, "com.docker.lancelot")
+		containers[i] = c
+	}
 
 	httputils.WriteJSON(w, http.StatusOK, containers)
+}
+
+func (p *Proxy) containerInspect(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	name := vars["name"]
+	container, err := p.api.ContainerInspect(context.Background(), name)
+	if err != nil {
+		p.error(w, err)
+		return
+	}
+	if _, ok := container.Config.Labels["com.docker.lancelot"]; !ok {
+		p.error(w, objNotFoundError{"container", name})
+		return
+	}
+
+	delete(container.Config.Labels, "com.docker.lancelot")
+	httputils.WriteJSON(w, http.StatusOK, container)
 }
